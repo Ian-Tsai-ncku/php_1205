@@ -1,7 +1,4 @@
 //RFID reads the tag by Arduino UNO
-#include <Servo.h>   //載入函式庫，這是內建的，不用安裝
-
-Servo myservo;  // 建立SERVO物件
 unsigned int status = 0;
 unsigned char val,RSSI,I,Q;
 unsigned int num=1;
@@ -12,7 +9,9 @@ unsigned char MyEPCID1[]={1,2,3,4,5,6,7,8,9,16,17,18};
 unsigned char MyEPCID2[]={1,2,3,4,5,6,7,8,9,16,17,19};
 unsigned char Rcard[12];
 unsigned char Freq[3];
-unsigned int count1=0,count2=0;
+unsigned int count1=0;
+unsigned int count2=0;
+int AnalogPin=3;
 
 //#include <SoftwareSerial.h>
 
@@ -110,13 +109,7 @@ void scanwithRSSI(void)
 
 void setup()
 {
-  myservo.attach(9);  // 設定要將伺服馬達接到哪一個PIN腳
-  myservo.write(0);  //旋轉到0度，就是一般所說的歸零
-  delay(1000);
-  myservo.write(180);
-  delay(1000);
-  myservo.write(0);
-  delay(1000);
+  pinMode(AnalogPin, OUTPUT); // 設定 pin 3 為輸出
   Serial.begin(115200);
 //  mySerial.begin(115200);
   Serial.write(SCMD,3);
@@ -124,7 +117,6 @@ void setup()
 
 void loop()
 {
-
 // if (status == 0)  
 //     mySerial.write(SCMD,3);
   delay(500);
@@ -142,16 +134,19 @@ void loop()
     Rcard[i]=0;
   }
   if(count1==12){
-    Serial.println("It is first RFID tag.");
-    myservo.write(90);  //旋轉到0度，就是一般所說的歸零
-    delay(1000);
+    Serial.print("First Tag");
+    for(int i=0;i<255;i++){
+      analogWrite(AnalogPin,i);
+      delay(150);
+    }
   }
   if(count2==12){
-    Serial.println("It is second RFID tag.");
-    myservo.write(180); //旋轉到180度
-    delay(1000);
+    Serial.print("Second Tag");
+    for(int i=255;i>0;i--){
+      analogWrite(AnalogPin,i);
+      delay(150);
+    }
   }
-
   count1=0;
   count2=0;
 }
